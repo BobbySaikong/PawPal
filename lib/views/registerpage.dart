@@ -37,7 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset('assets/images/image.png',
-              scale: 2,),
+              scale: 5,),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text('Please fill in the details'),

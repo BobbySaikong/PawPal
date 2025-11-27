@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/image.png',scale: 2.0,),
+              Image.asset('assets/images/image.png',scale: 5.0,),
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text('Login with your details'),
