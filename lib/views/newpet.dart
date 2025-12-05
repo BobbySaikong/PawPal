@@ -22,11 +22,18 @@ class SubmitPetScreen extends StatefulWidget {
 
 class _SubmitPetScreenState extends State<SubmitPetScreen> {
   List<String> petTypes = [
+    "Cat",
+    "Dog",
+    "Rabbit",
+    "Other"
     //todo: add
     // Cat, Dog, Rabbit, Other
   ];
 
   List<String> petCategory = [
+    "Adoption",
+    "Donation Request",
+    "Help/Rescue"
     //todo, insert
     // // •	Submission Category
     // o	Adoption
@@ -35,12 +42,15 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   ];
   TextEditingController petNameController = TextEditingController();
   TextEditingController petDescriptionController = TextEditingController();
-  TextEditingController hourlyrateController = TextEditingController();
-  String selectedPetType = 'Cleaning';
-  String selectedPetCategory = 'Kubang Pasu';
+  TextEditingController addressController = TextEditingController();
+
+  late double height, width;
+  String selectedPetType = 'Cat';
+  String selectedPetCategory = 'Adoption';
+  late Position mypostion;
+  String address = "";
   File? image;
   //Uint8List? webImage; // for web
-  late double height, width;
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +200,32 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     maxLines: 3,
                   ),
                   SizedBox(height: 10),
+                  TextField(
+                    maxLines: 3,
+                    controller: addressController,
+                    decoration: InputDecoration(
+                      labelText: 'Address',
+                      border: OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        onPressed: () async {
+                          mypostion = await _determinePosition();
+                          print(mypostion.latitude);
+                          print(mypostion.longitude);
+                          List<Placemark> placemarks =
+                              await placemarkFromCoordinates(
+                                mypostion.latitude,
+                                mypostion.longitude,
+                              );
+                          Placemark place = placemarks[0];
+                          addressController.text =
+                              "${place.name},\n${place.street},\n${place.postalCode},${place.locality},\n${place.administrativeArea},${place.country}";
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.location_on),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueGrey,
@@ -339,7 +375,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
     // Hourly rate
     // TODO: change to geocoding + geolocation (autofilled)
-    if (hourlyrateController.text.trim().isEmpty) {
+    if (addressController.text.trim().isEmpty) {
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(
       //     content: Text("Please enter hourly rate"),
@@ -398,7 +434,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     String petName = petNameController.text.trim();
     String petDescription = petDescriptionController.text.trim();
     //change with location of device (autofilled), geocoding, geolocation
-    String hourlyrate = hourlyrateController.text.trim();
+    String address = addressController.text.trim();
 
     http
         .post(
@@ -408,10 +444,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             'pet_name': petName,
             'pet_type': selectedPetType,
             'pet_category': selectedPetCategory,
-            //change hourly rate to Location, geocoding geolocation
-            //'hourlyrate': hourlyrate,
-            // 'latitude' : latitude
-            // 'longitude' : longitude
+            'latitude' : mypostion.latitude.toString(),
+            'longitude' : mypostion.longitude.toString(),
             'pet_description': petDescription,
             'image': base64image,
           },
@@ -422,12 +456,7 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             var jsonResponse = response.body;
             var responseArray = jsonDecode(jsonResponse);
             if (responseArray['success'] == 'true') {
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //   SnackBar(
-              //     content: Text("Service submitted successfully"),
-              //     backgroundColor: Colors.green,
-              //   ),
-              // );
+
               printSnackBar("Your pet submitted successfully!");
               Navigator.pop(context);
             } else {
