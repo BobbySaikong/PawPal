@@ -3,13 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-// import 'package:myfuwu/models/MyPets.dart';
+import 'package:pawpal/models/pet.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:pawpal/views/loginpage.dart';
 import 'package:pawpal/models/user.dart';
-// import 'package:myfuwu/shared/mydrawer.dart';
 import 'package:pawpal/views/newpet.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MainPage extends StatefulWidget {
   final User? user;
@@ -125,7 +123,7 @@ class _MainPageState extends State<MainPage> {
                                           0.22, // balanced aspect ratio
                                       color: Colors.grey[200],
                                       child: Image.network(
-                                        '${MyConfig.baseUrl}/myfuwu/assets/uploads/${listPets[index].serviceId}.png',
+                                        '${MyConfig.baseUrl}/myfuwu/assets/uploads/${listPets[index].petName}.png',
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) {
@@ -252,9 +250,10 @@ class _MainPageState extends State<MainPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text("Please login first/or register first"),
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.deepOrange,
               ),
             );
+
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const LoginPage()),
