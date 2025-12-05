@@ -10,19 +10,20 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 $userid = $_POST["user_id"];
 $petname = addslashes($_POST["pet_name"]);
 $petType = $_POST["pet_type"];
+$petcategory = $_POST["pet_category"];
+$description = addslashes($_POST["pet_description"]);
 $latitude = $_POST["latitude"];
 $longitude = $_POST["longitude"];
-$description = addslashes($_POST["description"]);
-$encodedimage = base64_decode($_POST["image"]);
+$decodedimage = base64_decode($_POST["image"]);
 
 // Insert new service into database
-$sqladdpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`,`description`,`lat`, `lng`)
-	VALUES ('$userid','$petname','$petType','$description','$latitude','$longitude')";
+$sqladdpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`,`pet_category`,`description`,`image_paths`,`lat`, `lng`)
+	VALUES ('$userid','$petname','$petType', '$petcategory','$description', '$decodedimage','$latitude','$longitude')";
 try {
-    if ($conn->query($sqladdpet) === true) {
+    if ($connect->query($sqladdpet) === true) {
         $last_id = $connect->insert_id;
         $filename = ". $petname . ".png";
-        file_put_contents("../uploads/" . $filename, $decodedImage);
+        file_put_contents("../assets/uploads/" . $filename, $decodedImage);
 
         $response = [
             "success" => true,

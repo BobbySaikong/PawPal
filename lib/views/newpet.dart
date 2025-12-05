@@ -1,0 +1,454 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:developer';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pawpal/models/user.dart';
+import 'package:pawpal/myconfig.dart';
+
+class SubmitPetScreen extends StatefulWidget {
+  final User? user;
+
+  const SubmitPetScreen({super.key, required this.user});
+
+  @override
+  State<SubmitPetScreen> createState() => _SubmitPetScreenState();
+}
+
+class _SubmitPetScreenState extends State<SubmitPetScreen> {
+  List<String> petTypes = [
+    //todo: add
+    // Cat, Dog, Rabbit, Other
+  ];
+
+  List<String> petCategory = [
+    //todo, insert
+    // // •	Submission Category
+    // o	Adoption
+    // o	Donation Request
+    // o	Help/Rescue
+  ];
+  TextEditingController petNameController = TextEditingController();
+  TextEditingController petDescriptionController = TextEditingController();
+  TextEditingController hourlyrateController = TextEditingController();
+  String selectedPetType = 'Cleaning';
+  String selectedPetCategory = 'Kubang Pasu';
+  File? image;
+  //Uint8List? webImage; // for web
+  late double height, width;
+
+  @override
+  Widget build(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
+    if (width > 600) {
+      width = 600;
+    } else {
+      width = width;
+    }
+    return Scaffold(
+      appBar: AppBar(title: Text('My Pets')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: width,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (kIsWeb) {
+                        openGallery();
+                      } else {
+                        pickImageDialog();
+                      }
+                    },
+                    child: Container(
+                      width: width,
+                      height: height / 3,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade200,
+                        border: Border.all(color: Colors.grey.shade400),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                        image: (image != null && !kIsWeb)
+                            ? DecorationImage(
+                                image: FileImage(image!),
+                                fit: BoxFit.cover,
+                              )
+                            // : (webImage != null)
+                            // ? DecorationImage(
+                            //     image: MemoryImage(webImage!),
+                            //     fit: BoxFit.cover,
+                            //   )
+                            : null, // no image → show icon instead
+                      ),
+
+                      // If no image selected → show camera icon
+                      // && webImage == null
+                      child: (image == null)
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.camera_alt,
+                                  size: 80,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Tap to add image",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black12,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : null,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: petNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Pet Name',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Select Pet Type',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    items: petTypes.map((String selectedPet) {
+                      return DropdownMenuItem<String>(
+                        value: selectedPet,
+                        child: Text(selectedPet),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPetType = newValue!;
+                        ;
+                        log(selectedPetType);
+                      });
+                    },
+                  ),
+
+                  SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Select Pet Category',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    items: this.petCategory.map((String petCategory) {
+                      return DropdownMenuItem<String>(
+                        value: petCategory,
+                        child: Text(petCategory),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPetCategory = newValue!;
+                      });
+                    },
+                  ),
+                  // SizedBox(height: 10),
+                  // TextField(
+                  //   controller: hourlyrateController,
+                  //   keyboardType: TextInputType.number,
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Hourly Rate',
+                  //     border: OutlineInputBorder(),
+                  //   ),
+                  // ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: petDescriptionController,
+                    decoration: InputDecoration(
+                      labelText: 'Pet Description',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                      minimumSize: Size(width, 50),
+
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      showSubmitDialog();
+                    },
+                    child: Text(
+                      'Submit Pet',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void pickImageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Pick Image for pet'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  openCamera();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.image),
+                title: Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  openGallery();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> openCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      // if (kIsWeb) {
+      //   webImage = await pickedFile.readAsBytes();
+      //   setState(() {});
+      // } else
+      {
+        image = File(pickedFile.path);
+        cropImage();
+      }
+    }
+  }
+
+  Future<void> openGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // if (kIsWeb) {
+      //   webImage = await pickedFile.readAsBytes();
+      //   setState(() {});
+      // } else
+      {
+        image = File(pickedFile.path);
+        cropImage(); // only for mobile
+      }
+    }
+  }
+
+  Future<void> cropImage() async {
+    //if (kIsWeb) return; // skip cropping on web
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      aspectRatio: CropAspectRatio(ratioX: 5, ratioY: 3),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Please Crop Your Image',
+          toolbarColor: Colors.deepPurple,
+          toolbarWidgetColor: Colors.white,
+        ),
+        IOSUiSettings(title: 'Cropper'),
+      ],
+    );
+
+    if (croppedFile != null) {
+      image = File(croppedFile.path);
+      setState(() {});
+    }
+  }
+
+  void showSubmitDialog() {
+    // Title validation
+    if (petNameController.text.trim().isEmpty) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Please enter pet name."),
+      //     backgroundColor: Colors.deepOrange,
+      //   ),
+      // );
+      printSnackBar("Please enter your pet name.");
+      return;
+    }
+
+    // Image validation: mobile uses image, web uses webImage
+    // !kIsWeb &&
+    if (image == null) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Please select an image regarding your pet."),
+      //     backgroundColor: Colors.deepOrange,
+      //   ),
+      // );
+      printSnackBar("Please select an image.");
+      return;
+    }
+
+    // if (kIsWeb && webImage == null) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text("Please select an image"),
+    //       backgroundColor: Colors.red,
+    //     ),
+    //   );
+    //   return;
+    // }
+
+    // Hourly rate
+    // TODO: change to geocoding + geolocation (autofilled)
+    if (hourlyrateController.text.trim().isEmpty) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Please enter hourly rate"),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
+      printSnackBar("please determine the location.");
+      return;
+    }
+
+    // petDescription
+    if (petDescriptionController.text.trim().isEmpty) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Please describe your pet"),
+      //     backgroundColor: Colors.deepOrange,
+      //   ),
+      // );
+      printSnackBar("Please describe your pet");
+      return;
+    }
+
+    // Confirm dialog
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Submit Pet'),
+          content: const Text('Are you sure you want to submit this pet?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                submitPet();
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void submitPet() {
+    String base64image = "";
+    // if (kIsWeb) {
+    //   base64image = base64Encode(webImage!);
+    // } else
+    {
+      base64image = base64Encode(image!.readAsBytesSync());
+    }
+    String petName = petNameController.text.trim();
+    String petDescription = petDescriptionController.text.trim();
+    //change with location of device (autofilled), geocoding, geolocation
+    String hourlyrate = hourlyrateController.text.trim();
+
+    http
+        .post(
+          Uri.parse('${MyConfig.baseUrl}/pawpal/api/submit_pet.php'),
+          body: {
+            'user_id': widget.user?.userId,
+            'pet_name': petName,
+            'pet_type': selectedPetType,
+            'pet_category': selectedPetCategory,
+            //change hourly rate to Location, geocoding geolocation
+            //'hourlyrate': hourlyrate,
+            // 'latitude' : latitude
+            // 'longitude' : longitude
+            'pet_description': petDescription,
+            'image': base64image,
+          },
+        )
+        .then((response) {
+          log(response.body);
+          if (response.statusCode == 200) {
+            var jsonResponse = response.body;
+            var responseArray = jsonDecode(jsonResponse);
+            if (responseArray['success'] == 'true') {
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     content: Text("Service submitted successfully"),
+              //     backgroundColor: Colors.green,
+              //   ),
+              // );
+              printSnackBar("Your pet submitted successfully!");
+              Navigator.pop(context);
+            } else {
+              if (!mounted) return;
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     content: Text(responseArray['message']),
+              //     backgroundColor: Colors.red,
+              //   ),
+              // );
+              printSnackBar(responseArray['message']);
+            }
+          }
+        });
+  }
+
+  void printSnackBar(String message) {
+    SnackBar snackbar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.deepOrange,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+}
