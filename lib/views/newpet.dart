@@ -21,19 +21,9 @@ class SubmitPetScreen extends StatefulWidget {
 }
 
 class _SubmitPetScreenState extends State<SubmitPetScreen> {
-  List<String> petTypes = [
-    "Cat",
-    "Dog",
-    "Rabbit",
-    "Other"
-  ];
+  List<String> petTypes = ["Cat", "Dog", "Rabbit", "Other"];
 
-  List<String> petCategory = [
-    "Adoption",
-    "Donation Request",
-    "Help/Rescue"
-
-  ];
+  List<String> petCategory = ["Adoption", "Donation Request", "Help/Rescue"];
   TextEditingController petNameController = TextEditingController();
   TextEditingController petDescriptionController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -91,10 +81,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                                 image: FileImage(image!),
                                 fit: BoxFit.cover,
                               )
-
                             : null, // no image → show icon instead
                       ),
-
 
                       child: (image == null)
                           ? Column(
@@ -269,7 +257,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-
       {
         image = File(pickedFile.path);
         cropImage();
@@ -282,7 +269,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-
       {
         image = File(pickedFile.path);
         cropImage(); // only for mobile
@@ -313,28 +299,22 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   void showSubmitDialog() {
     // Title validation
     if (petNameController.text.trim().isEmpty) {
-
       printSnackBar("Please enter your pet name.");
       return;
     }
 
-
     if (image == null) {
-
       printSnackBar("Please select an image.");
       return;
     }
 
-
     if (addressController.text.trim().isEmpty) {
-
       printSnackBar("please determine the location.");
       return;
     }
 
     // petDescription
     if (petDescriptionController.text.trim().isEmpty) {
-
       printSnackBar("Please describe your pet");
       return;
     }
@@ -381,8 +361,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             'pet_name': petName,
             'pet_type': selectedPetType,
             'pet_category': selectedPetCategory,
-            'latitude' : mypostion.latitude.toString(),
-            'longitude' : mypostion.longitude.toString(),
+            'latitude': mypostion.latitude.toString(),
+            'longitude': mypostion.longitude.toString(),
             'pet_description': petDescription,
             'image': base64image,
           },
@@ -393,7 +373,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
             var jsonResponse = response.body;
             var responseArray = jsonDecode(jsonResponse);
             if (responseArray['success'] == 'true') {
-
               printSnackBar("Your pet submitted successfully!");
               Navigator.pop(context);
             } else {
@@ -414,40 +393,41 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
   }
 
   Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+      bool serviceEnabled;
+      LocationPermission permission;
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+      // Test if location services are enabled.
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Location services are not enabled don't continue
+        // accessing the position and request users of the
+        // App to enable the location services.
+        return Future.error('Location services are disabled.');
       }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          // Permissions are denied, next time you could try
+          // requesting permissions again (this is also where
+          // Android's shouldShowRequestPermissionRationale
+          // returned true. According to Android guidelines
+          // your App should show an explanatory UI now.
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        // Permissions are denied forever, handle appropriately.
+        return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.',
+        );
+      }
+
+      // When we reach here, permissions are granted and we can
+      // continue accessing the position of the device.
+      return await Geolocator.getCurrentPosition();
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.',
-      );
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
-  }
 }

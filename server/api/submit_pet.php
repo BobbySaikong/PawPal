@@ -22,8 +22,8 @@ $sqladdpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`,`pet_cate
 try {
     if ($connect->query($sqladdpet) === true) {
         $last_id = $connect->insert_id;
-        $filename = ". $petname . ".png";
-        file_put_contents("../assets/uploads/" . $filename, $decodedImage);
+        $filename = "../assets/uploads/" . $petname . ".png";
+        file_put_contents($filename, $decodedImage);
 
         $response = [
             "success" => true,
@@ -45,5 +45,4 @@ function sendJsonResponse($sentArray)
     header("Content-Type: application/json");
     echo json_encode($sentArray);
 }
-
 ?>
