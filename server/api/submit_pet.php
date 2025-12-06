@@ -1,4 +1,5 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 include "dbconnect.php";
 
@@ -9,21 +10,21 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 }
 $userid = $_POST["user_id"];
 $petname = addslashes($_POST["pet_name"]);
-$petType = $_POST["pet_type"];
+$pettype = $_POST["pet_type"];
 $petcategory = $_POST["pet_category"];
 $description = addslashes($_POST["pet_description"]);
 $latitude = $_POST["latitude"];
 $longitude = $_POST["longitude"];
 $decodedimage = base64_decode($_POST["image"]);
 
-// Insert new service into database
-$sqladdpet = "INSERT INTO `tbl_pets`(`user_id`, `pet_name`, `pet_type`,`pet_category`,`description`,`image_paths`,`lat`, `lng`)
-	VALUES ('$userid','$petname','$petType', '$petcategory','$description', '$decodedimage','$latitude','$longitude')";
+// Insert new pet into database
+
+$sqladdpet = "INSERT INTO tbl_pets (user_id, pet_name , pet_type , pet_category , description , image_paths , lat , lng)
+	VALUES ('$userid','$petname','$pettype', '$petcategory','$description', '$decodedimage','$latitude','$longitude');";
 try {
-    if ($connect->query($sqladdpet) === true) {
-        $last_id = $connect->insert_id;
+    if ($connect->query($sqladdpet) === TRUE) {
         $filename = "../assets/uploads/" . $petname . ".png";
-        file_put_contents($filename, $decodedImage);
+        file_put_contents($filename, $decodedimage);
 
         $response = [
             "success" => true,
@@ -36,7 +37,7 @@ try {
     }
 } catch (Exception $e) {
     $response = ["success" => false, "message" => $e->getMessage()];
-    sendJsonResponse($response);
+    echo $e->getTraceAsString();
 }
 
 //	function to send json response
