@@ -37,8 +37,8 @@ try {
         sendJsonResponse($response);
     }
 } catch (Exception $e) {
-    $response = ["success" => false, "message" => $e->getMessage()];
     echo $e->getTraceAsString();
+    $response = ["success" => false, "message" => $e->getMessage()];
 }
 
 //	function to send json response
