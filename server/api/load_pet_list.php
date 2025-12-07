@@ -21,14 +21,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             p.category,
             p.description,
             p.created_at,
-            users.user_name,
-            users.user_id,
-            users.user_email,
-            users.user_phone,
-            users.user_regdate
-            FROM tbl_users users
-            JOIN tbl_pets p ON users.user_id = p.user_id
+            FROM tbl_pets p
     ";
+
+    // users.user_name,
+    // users.user_id,
+    // users.user_email,
+    // users.user_phone,
+    // users.user_regdate
 
     //Search logic
     // if (isset($_GET["search"]) && !empty($_GET["search"])) {
