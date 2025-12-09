@@ -8,34 +8,34 @@
 
 # Widgets/Packages
 
-	* From material.dart
-	* http
-	* geocoding & geolocator
-	* sharedPreference
-	* ImageCropper & ImagePicker
+* From material.dart
+* http
+* geocoding & geolocator
+* sharedPreference
+* ImageCropper & ImagePicker
 
 # Validation Approach
 
- * non-empty fields
- * passwords of 6 or more characters
- * RegExp validation
- * confirm-password field
- * Location generator
- * Alert Dialog
+* non-empty fields
+* passwords of 6 or more characters
+* RegExp validation
+* confirm-password field
+* Location generator
+* Alert Dialog
 
 # Setup Steps 
 1. Download [**xampp**](<https://www.apachefriends.org/download.html>)
 2. Execute installation setup
 3. Tick Boxes on *mySQL* *PHP* *Apache*
-<img>
+	<img>
 4. Complete installation
 5. Right-click xampp-control-panel shortcut and set "Run As Administrator"
 6. Run Install services stated in Step(3). 
 7. Start the services
 8. enter localhost/phpmyadmin (or replace with your device ip address, enter "ipconfig" in terminal/cmd/powershell)
 9. export database from pawpal_db.sql
-10. Run the main. dart from pawpal/lib/ folder (Ensure you setup flutter refer [Flutter Install](<https://docs.flutter.dev/install>)
-
+10. Run the "main.dart" file from "pawpal/lib/" folder (Ensure you setup flutter refer [**Flutter Install**](<https://docs.flutter.dev/install>)
+	
 
 
 # App Screenshots
