@@ -4,15 +4,15 @@
 
 [**Github**](<https://github.com/BobbySaikong/PawPal>)
 
-[**Youtube:**](<https://youtu.be/-NYrvtdath8>)
+[**Youtube**](<https://youtu.be/-NYrvtdath8>)
 
 # Widgets/Packages
 
-* From material.dart
-* http
-* geocoding & geolocator
-* sharedPreference
-* ImageCropper & ImagePicker
+	* From material.dart
+	* http
+	* geocoding & geolocator
+	* sharedPreference
+	* ImageCropper & ImagePicker
 
 # Validation Approach
 
@@ -22,6 +22,21 @@
  * confirm-password field
  * Location generator
  * Alert Dialog
+
+# Setup Steps 
+1. Download [**xampp**](<https://www.apachefriends.org/download.html>)
+2. Execute installation setup
+3. Tick Boxes on *mySQL* *PHP* *Apache*
+<img>
+4. Complete installation
+5. Right-click xampp-control-panel shortcut and set "Run As Administrator"
+6. Run Install services stated in Step(3). 
+7. Start the services
+8. enter localhost/phpmyadmin (or replace with your device ip address, enter "ipconfig" in terminal/cmd/powershell)
+9. export database from pawpal_db.sql
+10. Run the main. dart from pawpal/lib/ folder (Ensure you setup flutter refer [Flutter Install](<https://docs.flutter.dev/install>)
+
+
 
 # App Screenshots
 <img width="150" height="348" alt="image" src="https://github.com/user-attachments/assets/e363cfc8-2e09-432a-8cdc-75ff5fd21db7" />
@@ -34,6 +49,8 @@
 <img width="166" height="376" alt="image" src="https://github.com/user-attachments/assets/5034a54f-39ee-4999-b0c6-72f969b5d2c9" />
 <img width="167" height="376" alt="image" src="https://github.com/user-attachments/assets/b789583d-26b2-4aeb-8888-ae9be26da1e9" />
 <img width="166" height="374" alt="image" src="https://github.com/user-attachments/assets/f362dc9f-7fff-4265-9120-59647a7ab0f3" />
+
+
 
 Authorship Note
 
